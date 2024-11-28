@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Current Time</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        #time-container, #logged-times-container {
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .log-entry {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Toronto Current Time</h1>
+
+    <!-- Current time section -->
+    <div id="time-container">
+        Click the button to see the current time.
+    </div>
+    <button onclick="fetchCurrentTime()">Get Current Time</button>
+
+    <!-- Logged times section -->
+    <div id="logged-times-container">
+        Click the button to see the logged times.
+    </div>
+    <button onclick="fetchLoggedTimes()">Get Logged Times</button>
+
+    <script>
+        // Function to fetch the current time
+        async function fetchCurrentTime() {
+            try {
+                const response = await fetch('http://localhost:8080/current-time');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                document.getElementById('time-container').innerText = `Current Time: ${data.current_time}`;
+            } catch (error) {
+                console.error('Error fetching time:', error);
+                document.getElementById('time-container').innerText = 'Error fetching time. Please try again.';
+            }
+        }
+
+        // Function to fetch the logged times
+        async function fetchLoggedTimes() {
+            try {
+                const response = await fetch('http://localhost:8080/logged-times');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Clear the previous log entries before displaying new ones
+                const loggedTimesContainer = document.getElementById('logged-times-container');
+                loggedTimesContainer.innerHTML = '<strong>Logged Times:</strong>';
+
+                // Display each logged time
+                data.forEach(entry => {
+                    const logEntry = document.createElement('div');
+                    logEntry.classList.add('log-entry');
+                    logEntry.innerText = `Logged Time: ${entry.current_time}`;
+                    loggedTimesContainer.appendChild(logEntry);
+                });
+            } catch (error) {
+                console.error('Error fetching logged times:', error);
+                document.getElementById('logged-times-container').innerText = 'Error fetching logged times. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
